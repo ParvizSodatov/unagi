@@ -1,16 +1,38 @@
-# React + Vite
+# Унаги — суши-бар (Душанбе)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Монорепо сайта суши-бара «Унаги».
 
-Currently, two official plugins are available:
+```
+unagi/
+├── frontend/   # React + Vite + React Router + Ant Design — витрина, корзина, админка
+├── backend/    # Node + Express + SQLite — API: меню, заказы, авторизация, загрузка фото
+├── package.json  # корневые скрипты (запуск обоих разом)
+└── vercel.json   # деплой фронтенда на Vercel
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Быстрый старт
 
-## React Compiler
+```bash
+# 1. Установить зависимости обоих проектов
+npm run install:all
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# 2. Заполнить базу стартовым меню и создать админа (один раз)
+npm run seed
 
-## Expanding the ESLint configuration
+# 3. Запустить фронт и бэк одной командой
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Фронтенд: http://localhost:5173
+- Бэкенд (API): http://localhost:4001/api
+- Админ по умолчанию: **admin / admin123** (меняется в `backend/.env`)
+
+Можно запускать по отдельности: `npm run dev:front` и `npm run dev:back`.
+
+## Подробнее
+- Архитектура и эндпоинты API — [backend/README.md](backend/README.md)
+- Фронтенд общается с API через слой [frontend/src/api/](frontend/src/api/); адрес API задаётся в `frontend/.env` (`VITE_API_URL`).
+
+## Деплой
+- **Фронтенд** — Vercel (см. `vercel.json`): собирается из `frontend/`, SPA-роутинг через rewrites. На проде задать `VITE_API_URL` на публичный адрес бэкенда.
+- **Бэкенд** — отдельный хостинг с поддержкой Node (Railway / Render / VPS). SQLite-файл `backend/unagi.db` должен лежать на постоянном диске.
