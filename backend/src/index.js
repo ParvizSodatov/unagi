@@ -9,6 +9,8 @@ import authRoutes from './routes/auth.js'
 import menuRoutes from './routes/menu.js'
 import orderRoutes from './routes/orders.js'
 import uploadRoutes from './routes/upload.js'
+import staffRoutes from './routes/staff.js'
+import statsRoutes from './routes/stats.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -30,6 +32,8 @@ app.use('/api/auth', authRoutes)
 app.use('/api/menu', menuRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/upload', uploadRoutes)
+app.use('/api/staff', staffRoutes)
+app.use('/api/stats', statsRoutes)
 
 // 404 для неизвестных API-роутов
 app.use('/api', (req, res) => res.status(404).json({ error: 'Не найдено' }))

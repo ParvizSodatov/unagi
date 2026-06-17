@@ -1,26 +1,161 @@
-import PageHero from '../components/PageHero'
+import { useEffect, useState } from 'react'
+import { ConfigProvider, App as AntApp, Layout, Menu, Button, Spin } from 'antd'
+import {
+  DashboardOutlined, ShoppingOutlined, AppstoreOutlined, TagsOutlined,
+  TeamOutlined, ClockCircleOutlined, LogoutOutlined,
+} from '@ant-design/icons'
+import { auth } from '../api'
+import AdminLogin from './admin/AdminLogin'
+import DashboardSection from './admin/sections/DashboardSection'
+import OrdersSection from './admin/sections/OrdersSection'
+import DishesSection from './admin/sections/DishesSection'
+import CategoriesSection from './admin/sections/CategoriesSection'
+import StaffSection from './admin/sections/StaffSection'
+import TimesheetSection from './admin/sections/TimesheetSection'
+
+const { Sider, Content, Header } = Layout
+
+const MENU_ITEMS = [
+  { key: 'dashboard', icon: <DashboardOutlined />, label: 'Дашборд' },
+  { key: 'orders', icon: <ShoppingOutlined />, label: 'Заказы' },
+  { key: 'dishes', icon: <AppstoreOutlined />, label: 'Блюда' },
+  { key: 'categories', icon: <TagsOutlined />, label: 'Категории' },
+  { key: 'staff', icon: <TeamOutlined />, label: 'Сотрудники' },
+  { key: 'timesheet', icon: <ClockCircleOutlined />, label: 'Табель' },
+]
+
+const SECTIONS = {
+  dashboard: DashboardSection,
+  orders: OrdersSection,
+  dishes: DishesSection,
+  categories: CategoriesSection,
+  staff: StaffSection,
+  timesheet: TimesheetSection,
+}
+
+function AdminRoot() {
+  const [user, setUser] = useState(null)
+  const [checking, setChecking] = useState(true)
+  const [section, setSection] = useState('dashboard')
+  const [collapsed, setCollapsed] = useState(false)
+
+  // При загрузке проверяем сохранённый токен.
+  useEffect(() => {
+    if (!auth.isLoggedIn()) {
+      setChecking(false)
+      return
+    }
+    auth
+      .me()
+      .then((data) => setUser(data.user))
+      .catch(() => auth.logout())
+      .finally(() => setChecking(false))
+  }, [])
+
+  function handleLogout() {
+    auth.logout()
+    setUser(null)
+  }
+
+  if (checking) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
+
+  if (!user) return <AdminLogin onSuccess={setUser} />
+
+  const Section = SECTIONS[section]
+
+  return (
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={setCollapsed}
+        theme="dark"
+        width={260}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            gap: 11,
+            padding: collapsed ? '16px 8px' : '16px 20px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+          }}
+        >
+          <span
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 11,
+              background: '#F15A24',
+              display: 'grid',
+              placeItems: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <svg viewBox="0 0 24 24" fill="none" style={{ width: 22, height: 22 }}>
+              <path
+                d="M5 8c4-2 10-2 14 0M5 12c4-2 10-2 14 0M5 16c4-2 10-2 14 0"
+                stroke="#fff"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+          {!collapsed && (
+            <span style={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>
+              Унаги · админ
+            </span>
+          )}
+        </div>
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={[section]}
+          items={MENU_ITEMS}
+          onClick={(e) => setSection(e.key)}
+        />
+      </Sider>
+
+      <Layout>
+        <Header
+          style={{
+            background: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            padding: '0 24px',
+            borderBottom: '1px solid #f0f0f0',
+          }}
+        >
+          <span style={{ marginRight: 16, color: '#555' }}>👤 {user.login}</span>
+          <Button icon={<LogoutOutlined />} onClick={handleLogout}>
+            Выйти
+          </Button>
+        </Header>
+        <Content style={{ padding: 24, background: '#f5f5f5' }}>
+          <div style={{ background: '#fff', padding: 24, borderRadius: 8 }}>
+            <Section />
+          </div>
+        </Content>
+      </Layout>
+    </Layout>
+  )
+}
 
 export default function AdminPage() {
-  // Пока просто форма входа (заглушка). Настоящую авторизацию и панель сделаем позже.
   return (
-    <>
-      <PageHero eyebrow="для персонала" title="Вход в админку" />
-      <section className="section">
-        <div className="container">
-          <form className="admin-login" onSubmit={(e) => e.preventDefault()}>
-            <label className="admin-login__field">
-              <span>Логин</span>
-              <input type="text" placeholder="admin" />
-            </label>
-            <label className="admin-login__field">
-              <span>Пароль</span>
-              <input type="password" placeholder="••••••••" />
-            </label>
-            <button type="submit" className="btn btn--primary admin-login__btn">Войти</button>
-            <p className="admin-login__note">Панель управления меню и заказами — в разработке</p>
-          </form>
-        </div>
-      </section>
-    </>
+    <ConfigProvider theme={{ token: { colorPrimary: '#F15A24' } }}>
+      <AntApp>
+        <AdminRoot />
+      </AntApp>
+    </ConfigProvider>
   )
 }

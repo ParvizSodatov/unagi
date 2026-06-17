@@ -68,6 +68,46 @@ db.exec(`
     price     REAL NOT NULL,
     qty       INTEGER NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS staff (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT NOT NULL,
+    role       TEXT NOT NULL,
+    phone      TEXT,
+    salary     REAL NOT NULL DEFAULT 0,
+    status     TEXT NOT NULL DEFAULT 'active',
+    hired_at   TEXT,
+    note       TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS salary_payments (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    staff_id  INTEGER NOT NULL REFERENCES staff(id) ON DELETE CASCADE,
+    amount    REAL NOT NULL,
+    period    TEXT,
+    comment   TEXT,
+    paid_at   TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS salary_adjustments (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    staff_id   INTEGER NOT NULL REFERENCES staff(id) ON DELETE CASCADE,
+    type       TEXT NOT NULL,
+    amount     REAL NOT NULL,
+    reason     TEXT,
+    period     TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS shifts (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    staff_id   INTEGER NOT NULL REFERENCES staff(id) ON DELETE CASCADE,
+    date       TEXT NOT NULL,
+    hours      REAL NOT NULL DEFAULT 0,
+    note       TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `)
 
 export default db

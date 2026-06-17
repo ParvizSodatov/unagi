@@ -184,15 +184,6 @@ img { max-width: 100%; display: block; }
 .cart-empty h3 { font-size: 28px; margin-bottom: 8px; }
 .cart-empty p { color: var(--muted); margin-bottom: 24px; }
 
-/* ===== Форма входа в админку ===== */
-.admin-login { max-width: 380px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; padding: 36px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
-.admin-login__field { display: flex; flex-direction: column; gap: 7px; }
-.admin-login__field span { font-size: 14px; font-weight: 600; color: var(--ink-soft); }
-.admin-login__field input { padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 10px; font-size: 15px; font-family: 'Manrope', sans-serif; transition: border-color .2s; }
-.admin-login__field input:focus { outline: none; border-color: var(--orange); }
-.admin-login__btn { margin-top: 6px; }
-.admin-login__note { text-align: center; color: var(--muted); font-size: 13px; }
-
 /* ===== Контакты ===== */
 .contacts__inner { display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px; align-items: start; }
 .contacts__list { display: flex; flex-direction: column; gap: 22px; }
@@ -213,7 +204,47 @@ a.contacts__value:hover { color: var(--orange); }
 .footer__col a:hover { color: var(--orange); }
 .footer__bottom { border-top: 1px solid rgba(255,255,255,.1); padding: 22px 0; color: rgba(255,255,255,.45); font-size: 14px; text-align: center; }
 
+/* ===== Вход в админку (сплит-экран) ===== */
+.admin-login {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  overflow-y: auto;
+  background: #fff;
+}
+.admin-login__photo {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px;
+  color: #fff;
+}
+.admin-login__photo::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(150deg, rgba(241,90,36,.45) 0%, rgba(18,18,18,.55) 100%);
+}
+.admin-login__photo > * { position: relative; z-index: 1; }
+.admin-login__slogan { max-width: 360px; }
+.admin-login__slogan h2 { font-family: 'Jost', sans-serif; font-size: 34px; line-height: 1.2; margin-bottom: 12px; }
+.admin-login__slogan p { color: rgba(255,255,255,.85); font-size: 16px; }
+.admin-login__form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  background: #fff;
+}
+
 /* ===== Адаптив ===== */
+@media (max-width: 768px) {
+  .admin-login { grid-template-columns: 1fr; }
+  .admin-login__photo { display: none; }
+}
 @media (max-width: 900px) {
   .features__grid, .features__grid--4, .menu__grid, .channels { grid-template-columns: 1fr 1fr; }
   .about__inner, .contacts__inner { grid-template-columns: 1fr; }

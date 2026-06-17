@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
@@ -10,10 +10,14 @@ import CartPage from './pages/CartPage'
 import AdminPage from './pages/AdminPage'
 
 function App() {
+  const { pathname } = useLocation()
+  // В админке свой layout — глобальный хедер/футер сайта не показываем.
+  const isAdmin = pathname.startsWith('/admin')
+
   return (
     <>
       <ScrollToTop />
-      <Header />
+      {!isAdmin && <Header />}
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -24,7 +28,7 @@ function App() {
           <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </main>
-      <Footer />
+      {!isAdmin && <Footer />}
     </>
   )
 }
