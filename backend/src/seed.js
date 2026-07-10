@@ -47,6 +47,28 @@ function seedDishes() {
   console.log(`Добавлено блюд: ${dishes.length}`)
 }
 
+// Стартовые зоны доставки по Душанбе (примерные — потом меняются в админке).
+const zones = [
+  { name: 'Центр', price: 15, min_order: 50, free_from: 200, sort: 1 },
+  { name: 'Исмоили Сомони', price: 20, min_order: 60, free_from: 250, sort: 2 },
+  { name: 'Сино', price: 25, min_order: 70, free_from: 300, sort: 3 },
+  { name: 'Фирдавси', price: 25, min_order: 70, free_from: 300, sort: 4 },
+  { name: 'Окраина', price: 35, min_order: 100, free_from: null, sort: 5 },
+]
+
+function seedZones() {
+  const count = db.prepare('SELECT COUNT(*) AS n FROM delivery_zones').get().n
+  if (count > 0) {
+    console.log(`Зоны доставки уже есть (${count}), пропускаю.`)
+    return
+  }
+  const insert = db.prepare(
+    'INSERT INTO delivery_zones (name, price, min_order, free_from, sort) VALUES (?, ?, ?, ?, ?)',
+  )
+  transaction(() => zones.forEach((z) => insert.run(z.name, z.price, z.min_order, z.free_from, z.sort)))
+  console.log(`Добавлено зон доставки: ${zones.length}`)
+}
+
 function seedAdmin() {
   const login = process.env.ADMIN_LOGIN || 'admin'
   const password = process.env.ADMIN_PASSWORD || 'admin123'
@@ -62,5 +84,6 @@ function seedAdmin() {
 
 seedCategories()
 seedDishes()
+seedZones()
 seedAdmin()
 console.log('Сид завершён.')

@@ -11,6 +11,9 @@ import orderRoutes from './routes/orders.js'
 import uploadRoutes from './routes/upload.js'
 import staffRoutes from './routes/staff.js'
 import statsRoutes from './routes/stats.js'
+import deliveryRoutes from './routes/delivery.js'
+import courierRoutes from './routes/couriers.js'
+import { telegramEnabled, startTelegramBot } from './notify.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -34,6 +37,8 @@ app.use('/api/orders', orderRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/staff', staffRoutes)
 app.use('/api/stats', statsRoutes)
+app.use('/api/delivery', deliveryRoutes)
+app.use('/api/couriers', courierRoutes)
 
 // 404 для неизвестных API-роутов
 app.use('/api', (req, res) => res.status(404).json({ error: 'Не найдено' }))
@@ -48,4 +53,6 @@ const PORT = process.env.PORT || 4000
 app.listen(PORT, () => {
   console.log(`Унаги API запущен: http://localhost:${PORT}`)
   console.log(`Разрешённые origin: ${origins.join(', ')}`)
+  console.log(`Telegram-оповещения: ${telegramEnabled ? 'включены' : 'выключены (не задан TELEGRAM_BOT_TOKEN/CHAT_ID)'}`)
+  startTelegramBot()
 })

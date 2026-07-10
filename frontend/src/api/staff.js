@@ -28,6 +28,8 @@ export const deleteAdjustment = (id, aid) =>
 // ─── Табель / смены (админ) ───
 export const getShiftsSummary = (month) =>
   request(`/staff/shifts?month=${month}`, { auth: true })
+export const getMonthShifts = (month) =>
+  request(`/staff/shifts/calendar?month=${month}`, { auth: true })
 export const getShifts = (id, month) =>
   request(`/staff/${id}/shifts${month ? `?month=${month}` : ''}`, { auth: true })
 export const addShift = (id, data) =>

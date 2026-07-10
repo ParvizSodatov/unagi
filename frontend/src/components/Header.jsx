@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ShoppingCartOutlined } from '@ant-design/icons'
 import Logo from './Logo'
+import { useCart } from '../context/CartContext'
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const { pathname } = useLocation()
+  const { count } = useCart()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -46,7 +48,7 @@ export default function Header() {
         <div className="header__actions">
           <NavLink to="/cart" className="cart-btn" aria-label="Корзина">
             <ShoppingCartOutlined />
-            <span className="cart-btn__count">0</span>
+            {count > 0 && <span className="cart-btn__count">{count}</span>}
           </NavLink>
           <NavLink to="/admin" className="btn btn--ghost admin-btn">Админ</NavLink>
           <button className="burger" aria-label="Меню" onClick={() => setOpen(o => !o)}>

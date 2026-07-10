@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ConfigProvider, App as AntApp, Layout, Menu, Button, Spin } from 'antd'
 import {
   DashboardOutlined, ShoppingOutlined, AppstoreOutlined, TagsOutlined,
-  TeamOutlined, ClockCircleOutlined, LogoutOutlined,
+  TeamOutlined, ClockCircleOutlined, LogoutOutlined, CarOutlined, EnvironmentOutlined,
 } from '@ant-design/icons'
 import { auth } from '../api'
 import AdminLogin from './admin/AdminLogin'
@@ -12,6 +12,8 @@ import DishesSection from './admin/sections/DishesSection'
 import CategoriesSection from './admin/sections/CategoriesSection'
 import StaffSection from './admin/sections/StaffSection'
 import TimesheetSection from './admin/sections/TimesheetSection'
+import DeliverySection from './admin/sections/DeliverySection'
+import CouriersSection from './admin/sections/CouriersSection'
 
 const { Sider, Content, Header } = Layout
 
@@ -20,6 +22,8 @@ const MENU_ITEMS = [
   { key: 'orders', icon: <ShoppingOutlined />, label: 'Заказы' },
   { key: 'dishes', icon: <AppstoreOutlined />, label: 'Блюда' },
   { key: 'categories', icon: <TagsOutlined />, label: 'Категории' },
+  { key: 'delivery', icon: <CarOutlined />, label: 'Доставка' },
+  { key: 'couriers', icon: <EnvironmentOutlined />, label: 'Курьеры' },
   { key: 'staff', icon: <TeamOutlined />, label: 'Сотрудники' },
   { key: 'timesheet', icon: <ClockCircleOutlined />, label: 'Табель' },
 ]
@@ -29,6 +33,8 @@ const SECTIONS = {
   orders: OrdersSection,
   dishes: DishesSection,
   categories: CategoriesSection,
+  delivery: DeliverySection,
+  couriers: CouriersSection,
   staff: StaffSection,
   timesheet: TimesheetSection,
 }

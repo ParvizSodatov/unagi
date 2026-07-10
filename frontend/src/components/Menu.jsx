@@ -1,10 +1,20 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { categories, dishes } from '../data/menu'
+import { useCart } from '../context/CartContext'
 
 // preview=true — короткая версия для главной (без табов, несколько блюд + кнопка)
 export default function Menu({ preview = false }) {
   const [active, setActive] = useState('all')
+  const { add } = useCart()
+  // id блюда, у которого только что нажали кнопку — для короткой надписи «Добавлено ✓»
+  const [added, setAdded] = useState(null)
+
+  function handleAdd(dish) {
+    add(dish)
+    setAdded(dish.id)
+    setTimeout(() => setAdded((cur) => (cur === dish.id ? null : cur)), 1200)
+  }
 
   const list = preview
     ? dishes.slice(0, 6)
@@ -48,7 +58,12 @@ export default function Menu({ preview = false }) {
                   <span className="dish__price">{d.price} c.</span>
                 </div>
                 <p className="dish__desc">{d.desc}</p>
-                <button className="btn btn--primary dish__btn">В корзину</button>
+                <button
+                  className="btn btn--primary dish__btn"
+                  onClick={() => handleAdd(d)}
+                >
+                  {added === d.id ? 'Добавлено ✓' : 'В корзину'}
+                </button>
               </div>
             </article>
           ))}

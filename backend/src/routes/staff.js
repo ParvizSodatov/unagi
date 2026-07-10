@@ -28,6 +28,22 @@ router.get('/shifts', (req, res) => {
   res.json({ month, summary: rows })
 })
 
+// GET /api/staff/shifts/calendar?month=YYYY-MM — все смены за месяц с именами (для календаря)
+router.get('/shifts/calendar', (req, res) => {
+  const month = req.query.month || new Date().toISOString().slice(0, 7)
+  const rows = db
+    .prepare(
+      `SELECT sh.id, sh.staff_id, sh.date, sh.hours, sh.note,
+              s.name AS staff_name, s.role AS staff_role
+         FROM shifts sh
+         JOIN staff s ON s.id = sh.staff_id
+        WHERE strftime('%Y-%m', sh.date) = ?
+        ORDER BY sh.date, s.name`,
+    )
+    .all(month)
+  res.json({ month, shifts: rows })
+})
+
 // ─── Сотрудники ────────────────────────────────────────────────────
 
 // GET /api/staff — список + суммы выплат, премий и штрафов по каждому

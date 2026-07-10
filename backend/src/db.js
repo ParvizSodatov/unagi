@@ -108,6 +108,40 @@ db.exec(`
     note       TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS delivery_zones (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    name      TEXT NOT NULL,
+    price     REAL NOT NULL DEFAULT 0,
+    min_order REAL NOT NULL DEFAULT 0,
+    free_from REAL,                       -- бесплатная доставка от суммы (NULL — нет)
+    sort      INTEGER NOT NULL DEFAULT 0,
+    active    INTEGER NOT NULL DEFAULT 1
+  );
+
+  CREATE TABLE IF NOT EXISTS couriers (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT NOT NULL,
+    phone      TEXT,
+    token      TEXT NOT NULL UNIQUE,      -- секрет в ссылке курьера (без пароля)
+    active     INTEGER NOT NULL DEFAULT 1,
+    last_lat   REAL,                      -- последняя координата
+    last_lng   REAL,
+    last_at    TEXT,                      -- когда обновлялась
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `)
+
+// ─── Мягкие миграции: добавляем недостающие колонки в существующие таблицы ───
+function ensureColumn(table, column, definition) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all()
+  if (!cols.some((c) => c.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)
+  }
+}
+
+// Доставка в заказе: название зоны и её стоимость (для заказов, созданных до фичи — 0).
+ensureColumn('orders', 'delivery_zone', 'TEXT')
+ensureColumn('orders', 'delivery_fee', 'REAL NOT NULL DEFAULT 0')
 
 export default db
