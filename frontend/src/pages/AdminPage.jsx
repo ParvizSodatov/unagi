@@ -83,6 +83,7 @@ function AdminRoot() {
         onCollapse={setCollapsed}
         theme="dark"
         width={260}
+        style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'auto' }}
       >
         <div
           style={{

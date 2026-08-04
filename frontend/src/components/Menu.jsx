@@ -1,14 +1,30 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { categories, dishes } from '../data/menu'
+import { getMenu } from '../api/menu'
 import { useCart } from '../context/CartContext'
+
+// Сколько блюд показываем на одной странице меню
+const PAGE_SIZE = 12
 
 // preview=true — короткая версия для главной (без табов, несколько блюд + кнопка)
 export default function Menu({ preview = false }) {
+  const [categories, setCategories] = useState([])
+  const [dishes, setDishes] = useState([])
   const [active, setActive] = useState('all')
+  const [page, setPage] = useState(1)
+  const gridRef = useRef(null)
   const { add } = useCart()
   // id блюда, у которого только что нажали кнопку — для короткой надписи «Добавлено ✓»
   const [added, setAdded] = useState(null)
+
+  useEffect(() => {
+    getMenu()
+      .then((data) => {
+        setCategories(data.categories)
+        setDishes(data.dishes.filter((d) => d.available))
+      })
+      .catch(() => {})
+  }, [])
 
   function handleAdd(dish) {
     add(dish)
@@ -16,11 +32,22 @@ export default function Menu({ preview = false }) {
     setTimeout(() => setAdded((cur) => (cur === dish.id ? null : cur)), 1200)
   }
 
+  function selectTab(id) {
+    setActive(id)
+    setPage(1)
+  }
+
+  function goToPage(p) {
+    setPage(p)
+    // Возвращаемся к началу списка, чтобы не оставаться внизу страницы
+    gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const filtered = active === 'all' ? dishes : dishes.filter(d => d.cat === active)
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const list = preview
     ? dishes.slice(0, 6)
-    : active === 'all'
-      ? dishes
-      : dishes.filter(d => d.cat === active)
+    : filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   return (
     <section className={`section${preview ? ' section--warm' : ''}`}>
@@ -34,11 +61,11 @@ export default function Menu({ preview = false }) {
 
         {!preview && (
           <div className="menu__tabs">
-            {categories.map(c => (
+            {[{ id: 'all', label: 'Всё' }, ...categories].map(c => (
               <button
                 key={c.id}
                 className={`menu__tab${active === c.id ? ' is-active' : ''}`}
-                onClick={() => setActive(c.id)}
+                onClick={() => selectTab(c.id)}
               >
                 {c.label}
               </button>
@@ -46,11 +73,13 @@ export default function Menu({ preview = false }) {
           </div>
         )}
 
-        <div className="menu__grid">
+        <div className="menu__grid" ref={gridRef}>
           {list.map(d => (
             <article className="dish" key={d.id}>
               <div className="dish__media">
-                <img src={d.img} alt={d.name} loading="lazy" />
+                {d.img
+                  ? <img src={d.img} alt={d.name} loading="lazy" />
+                  : <span className="dish__placeholder" aria-hidden="true">🍣</span>}
               </div>
               <div className="dish__body">
                 <div className="dish__head">
@@ -68,6 +97,34 @@ export default function Menu({ preview = false }) {
             </article>
           ))}
         </div>
+
+        {!preview && totalPages > 1 && (
+          <div className="menu__pager">
+            <button
+              className="menu__page-btn"
+              disabled={page === 1}
+              onClick={() => goToPage(page - 1)}
+            >
+              ←
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <button
+                key={p}
+                className={`menu__page-btn${page === p ? ' is-active' : ''}`}
+                onClick={() => goToPage(p)}
+              >
+                {p}
+              </button>
+            ))}
+            <button
+              className="menu__page-btn"
+              disabled={page === totalPages}
+              onClick={() => goToPage(page + 1)}
+            >
+              →
+            </button>
+          </div>
+        )}
 
         {preview && (
           <div className="menu__more">

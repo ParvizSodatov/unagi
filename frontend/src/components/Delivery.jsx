@@ -1,9 +1,9 @@
 import { PhoneOutlined, SendOutlined, InstagramOutlined } from '@ant-design/icons'
 
 const channels = [
-  { Icon: PhoneOutlined, title: 'Позвонить', value: '+992 00 000 00 00', href: 'tel:+992000000000' },
+  { Icon: PhoneOutlined, title: 'Позвонить', value: '+992 90 575 33 00', href: 'tel:+992905753300' },
   { Icon: SendOutlined, title: 'Telegram', value: '@unagi_dushanbe', href: '#' },
-  { Icon: InstagramOutlined, title: 'Instagram', value: '@unagi.tj', href: '#' },
+  { Icon: InstagramOutlined, title: 'Instagram', value: '@unagi_tj', href: 'https://www.instagram.com/unagi_tj/' },
 ]
 
 export default function Delivery() {

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { Table, Button, Space, Modal, Select, Tag, Descriptions, App } from 'antd'
-import { ReloadOutlined, EyeOutlined } from '@ant-design/icons'
+import { useEffect, useMemo, useState } from 'react'
+import { Table, Button, Space, Modal, Select, Tag, Descriptions, Input, App } from 'antd'
+import { ReloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons'
 import { orders as ordersApi } from '../../../api'
 
 const STATUS = {
@@ -17,7 +17,20 @@ export default function OrdersSection() {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState(null)
+  const [search, setSearch] = useState('')
   const [detail, setDetail] = useState(null) // открытый заказ
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return rows
+    const qDigits = q.replace(/\D/g, '')
+    return rows.filter((r) => {
+      if ((r.customer || '').toLowerCase().includes(q)) return true
+      const phone = r.phone || ''
+      if (phone.toLowerCase().includes(q)) return true
+      return qDigits && phone.replace(/\D/g, '').includes(qDigits)
+    })
+  }, [rows, search])
 
   async function load() {
     setLoading(true)
@@ -91,6 +104,14 @@ export default function OrdersSection() {
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', gap: 12 }}>
         <h2 style={{ margin: 0 }}>Заказы</h2>
         <Space>
+          <Input
+            allowClear
+            placeholder="Поиск: клиент или телефон"
+            prefix={<SearchOutlined style={{ color: '#bbb' }} />}
+            style={{ width: 220 }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
           <Select
             allowClear
             placeholder="Все статусы"
@@ -105,7 +126,7 @@ export default function OrdersSection() {
         </Space>
       </div>
 
-      <Table rowKey="id" columns={columns} dataSource={rows} loading={loading} pagination={{ pageSize: 10 }} />
+      <Table rowKey="id" columns={columns} dataSource={filtered} loading={loading} pagination={{ pageSize: 10 }} />
 
       <Modal
         title={detail ? `Заказ №${detail.id}` : ''}

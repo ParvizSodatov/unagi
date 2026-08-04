@@ -7,13 +7,13 @@ export default function Footer() {
       <div className="container footer__inner">
         <div className="footer__col">
           <Logo light />
-          <p className="footer__desc">Суши-бар в Душанбе.<br />Свежо. Вкусно. С доставкой.</p>
+          <p className="footer__desc">Улетные роллы в городе.<br />Свежо. Вкусно. С доставкой.</p>
         </div>
         <div className="footer__col">
           <h4>Контакты</h4>
-          <p>г. Душанбе, ул. Рудаки, 00</p>
-          <p>+992 00 000 00 00</p>
-          <p>каждый день 10:00 – 23:00</p>
+          <p>г. Душанбе, ТЦ «Гулдаста», 92 мкр</p>
+          <p><a href="tel:+992905753300">+992 90 575 33 00</a></p>
+          <p>каждый день 10:00 – 00:00</p>
         </div>
         <div className="footer__col">
           <h4>Разделы</h4>

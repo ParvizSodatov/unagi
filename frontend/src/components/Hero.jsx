@@ -6,7 +6,6 @@ export default function Hero() {
       <div className="hero__overlay"></div>
       <div className="container">
         <div className="hero__content">
-          <span className="hero__badge"><span className="dot"></span> суши-бар · Душанбе</span>
           <h1 className="hero__title">Свежие суши<br />каждый день</h1>
           <p className="hero__subtitle">
             Готовим роллы и суши по японским рецептам из свежих ингредиентов.
@@ -19,7 +18,7 @@ export default function Hero() {
           <div className="hero__meta">
             <div className="hero__meta-item"><b>50+</b><span>блюд в меню</span></div>
             <div className="hero__meta-item"><b>40 мин</b><span>доставка</span></div>
-            <div className="hero__meta-item"><b>5★</b><span>оценка гостей</span></div>
+            <div className="hero__meta-item"><b>1000+</b><span>довольных гостей</span></div>
           </div>
         </div>
       </div>

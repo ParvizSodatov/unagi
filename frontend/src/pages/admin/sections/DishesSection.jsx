@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Table, Button, Space, Modal, Form, Input, InputNumber, Select,
   Switch, Popconfirm, Upload, Image, Tag, App,
 } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, SearchOutlined } from '@ant-design/icons'
 import { menu } from '../../../api'
 import { imgUrl } from '../../../config'
 
@@ -16,7 +16,14 @@ export default function DishesSection() {
   const [editing, setEditing] = useState(null)
   const [img, setImg] = useState(null) // путь к фото в форме
   const [uploading, setUploading] = useState(false)
+  const [search, setSearch] = useState('')
   const [form] = Form.useForm()
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return dishes
+    return dishes.filter((d) => (d.name || '').toLowerCase().includes(q))
+  }, [dishes, search])
 
   async function load() {
     setLoading(true)
@@ -136,14 +143,24 @@ export default function DishesSection() {
 
   return (
     <>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', gap: 12 }}>
         <h2 style={{ margin: 0 }}>Блюда</h2>
-        <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-          Добавить
-        </Button>
+        <Space>
+          <Input
+            allowClear
+            placeholder="Поиск по названию"
+            prefix={<SearchOutlined style={{ color: '#bbb' }} />}
+            style={{ width: 220 }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+            Добавить
+          </Button>
+        </Space>
       </div>
 
-      <Table rowKey="id" columns={columns} dataSource={dishes} loading={loading} pagination={{ pageSize: 10 }} />
+      <Table rowKey="id" columns={columns} dataSource={filtered} loading={loading} pagination={{ pageSize: 10 }} />
 
       <Modal
         title={editing ? 'Редактировать блюдо' : 'Новое блюдо'}
