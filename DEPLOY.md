@@ -2,6 +2,25 @@
 
 Схема: **бэкенд на Railway** (триал $5, ~месяц работы, данные сохраняются на volume) + **фронтенд на Vercel** (бесплатно бессрочно).
 
+## ✅ Текущее состояние (задеплоено 4 августа 2026)
+
+- **Сайт:** https://unagi-seven.vercel.app
+- **API:** https://backend-production-e9a25.up.railway.app/api (проверка: `/api/health`)
+- **Проект Railway:** https://railway.com/project/a0993a71-6b05-4792-acc1-802f9f69f433 (сервис `backend`, volume на `/data`)
+- **Проект Vercel:** `parvizsodatovs-projects/unagi`
+
+Деплой сделан через CLI, **автодеплоя из GitHub нет** — после изменений кода передеплой руками:
+
+```powershell
+# бэкенд (из папки backend/)
+railway up --service backend --detach
+
+# фронтенд (из корня репы)
+vercel deploy --prod --yes
+```
+
+Ниже — исходная инструкция, если придётся настраивать с нуля.
+
 ## 1. Бэкенд → Railway
 
 1. Зайди на [railway.com](https://railway.com), войди через GitHub (карта не нужна, дают $5 триала на 30 дней).
