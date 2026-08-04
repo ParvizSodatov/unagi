@@ -333,5 +333,9 @@ a.contacts__value:hover { color: var(--orange); }
   .nav, .header__cta { display: none; }
   .burger { display: flex; }
   .nav.is-open { display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: rgba(255,255,255,.98); backdrop-filter: blur(14px); padding: 22px 24px; gap: 18px; box-shadow: var(--shadow); }
+  /* Фон выпадающего меню всегда белый, поэтому и поверх тёмного hero ссылки должны быть тёмными */
+  .header--over-hero .nav.is-open .nav__link { color: var(--ink-soft); }
+  .header--over-hero .nav.is-open .nav__link:hover { color: var(--orange); }
+  .header--over-hero .nav.is-open .nav__link.is-active { color: var(--orange); }
   .features__grid, .features__grid--4, .menu__grid, .channels, .footer__inner { grid-template-columns: 1fr; }
 }
