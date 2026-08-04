@@ -1,9 +1,8 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import { fileURLToPath } from 'node:url'
-import path from 'node:path'
 
+import { uploadsDir } from './paths.js'
 import './db.js' // создаёт таблицы при старте
 import authRoutes from './routes/auth.js'
 import menuRoutes from './routes/menu.js'
@@ -15,7 +14,6 @@ import deliveryRoutes from './routes/delivery.js'
 import courierRoutes from './routes/couriers.js'
 import { telegramEnabled, startTelegramBot } from './notify.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
 
 const origins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
@@ -26,7 +24,7 @@ app.use(cors({ origin: origins }))
 app.use(express.json())
 
 // Раздаём загруженные фото статикой
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
+app.use('/uploads', express.static(uploadsDir))
 
 // Проверка живости
 app.get('/api/health', (req, res) => res.json({ ok: true, ts: Date.now() }))

@@ -1,12 +1,9 @@
 import { Router } from 'express'
 import multer from 'multer'
-import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import { requireAuth } from '../auth.js'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const uploadDir = path.join(__dirname, '..', '..', 'uploads')
+import { uploadsDir as uploadDir } from '../paths.js'
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),

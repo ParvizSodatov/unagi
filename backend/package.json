@@ -5,9 +5,12 @@
   "type": "module",
   "description": "Бэкенд суши-бара «Унаги»: меню, заказы, админка",
   "main": "src/index.js",
+  "engines": {
+    "node": ">=22.5"
+  },
   "scripts": {
     "dev": "node --watch src/index.js",
-    "start": "node src/index.js",
+    "start": "node src/seed.js && node src/index.js",
     "seed": "node src/seed.js"
   },
   "dependencies": {
