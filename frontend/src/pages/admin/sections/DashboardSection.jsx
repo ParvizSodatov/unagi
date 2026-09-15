@@ -57,7 +57,7 @@ export default function DashboardSection() {
               title="Выручка сегодня"
               value={revenue.today}
               suffix="c."
-              prefix={<DollarOutlined style={{ color: '#F15A24' }} />}
+              prefix={<DollarOutlined style={{ color: 'var(--orange)' }} />}
             />
           </Card>
         </Col>
@@ -85,7 +85,7 @@ export default function DashboardSection() {
             <Statistic
               title="Заказов сегодня"
               value={orders.today}
-              prefix={<ShoppingOutlined style={{ color: '#F15A24' }} />}
+              prefix={<ShoppingOutlined style={{ color: 'var(--orange)' }} />}
             />
           </Card>
         </Col>
@@ -104,7 +104,7 @@ export default function DashboardSection() {
             <Statistic
               title="Сотрудников"
               value={staff.active}
-              prefix={<TeamOutlined style={{ color: '#F15A24' }} />}
+              prefix={<TeamOutlined style={{ color: 'var(--orange)' }} />}
             />
           </Card>
         </Col>

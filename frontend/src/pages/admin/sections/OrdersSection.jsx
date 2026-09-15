@@ -107,7 +107,7 @@ export default function OrdersSection() {
           <Input
             allowClear
             placeholder="Поиск: клиент или телефон"
-            prefix={<SearchOutlined style={{ color: '#bbb' }} />}
+            prefix={<SearchOutlined style={{ color: 'var(--faint)' }} />}
             style={{ width: 220 }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}

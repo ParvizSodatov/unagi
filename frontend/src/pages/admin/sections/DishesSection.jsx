@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   Table, Button, Space, Modal, Form, Input, InputNumber, Select,
-  Switch, Popconfirm, Upload, Image, Tag, App,
+  Switch, Upload, Image, Tag, App,
 } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, SearchOutlined } from '@ant-design/icons'
 import { menu } from '../../../api'
+import { useConfirm } from '../../../components/ConfirmDialog.jsx'
 import { imgUrl } from '../../../config'
 
 export default function DishesSection() {
   const { message } = App.useApp()
+  const { confirmDelete } = useConfirm()
   const [dishes, setDishes] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(false)
@@ -128,14 +130,17 @@ export default function DishesSection() {
       render: (_, row) => (
         <Space>
           <Button size="small" icon={<EditOutlined />} onClick={() => openEdit(row)} />
-          <Popconfirm
-            title="Удалить блюдо?"
-            okText="Да"
-            cancelText="Нет"
-            onConfirm={() => handleDelete(row.id)}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
+          <Button
+            size="small"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => confirmDelete({
+              title: 'Удалить блюдо?',
+              description: 'Блюдо исчезнет из меню на сайте.',
+              name: row.name,
+              onConfirm: () => handleDelete(row.id),
+            })}
+          />
         </Space>
       ),
     },
@@ -149,7 +154,7 @@ export default function DishesSection() {
           <Input
             allowClear
             placeholder="Поиск по названию"
-            prefix={<SearchOutlined style={{ color: '#bbb' }} />}
+            prefix={<SearchOutlined style={{ color: 'var(--faint)' }} />}
             style={{ width: 220 }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -185,7 +190,14 @@ export default function DishesSection() {
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item name="desc" label="Описание">
-            <Input.TextArea rows={2} placeholder="Лосось, сливочный сыр, огурец" />
+            <Input.TextArea rows={2} placeholder="8 шт · Лосось, сливочный сыр, огурец" />
+          </Form.Item>
+          <Form.Item
+            name="composition"
+            label="Состав с граммовкой"
+            tooltip="Ингредиенты и вес каждого — показывается на карточке блюда под описанием"
+          >
+            <Input.TextArea rows={3} placeholder="Лосось 40 г, сыр сливочный 30 г, огурец 20 г, рис 100 г, нори 3 г" />
           </Form.Item>
           <Form.Item label="Фото">
             <Space align="start">

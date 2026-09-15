@@ -1,0 +1,174 @@
+/* Единый центральный диалог подтверждения (удаление и другие опасные действия) */
+
+.cfm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 18, 24, 0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: cfm-fade 0.18s ease-out;
+}
+
+.cfm-dialog {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 28px 24px 20px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(15, 18, 24, 0.28);
+  animation: cfm-pop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cfm-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+
+.cfm-icon--danger {
+  color: #e5484d;
+  background: #fdecec;
+  box-shadow: 0 0 0 8px #fdf5f5;
+}
+
+.cfm-icon--primary {
+  color: var(--orange);
+  background: #fdeee7;
+  box-shadow: 0 0 0 8px #fdf7f4;
+}
+
+.cfm-title {
+  margin: 0 0 8px;
+  font-family: 'Jost', sans-serif;
+  font-size: 21px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.cfm-text {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.cfm-name {
+  display: block;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--paper-warm);
+  font-weight: 600;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.cfm-error {
+  margin: 14px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fdecec;
+  color: #c62c31;
+  font-size: 13px;
+  text-align: left;
+}
+
+.cfm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.cfm-btn {
+  flex: 1;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.cfm-btn:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.cfm-btn--ghost {
+  background: #f1efec;
+  color: var(--ink-soft);
+}
+
+.cfm-btn--ghost:hover:not(:disabled) {
+  background: #e6e3df;
+}
+
+.cfm-btn--danger {
+  background: #e5484d;
+  color: #fff;
+}
+
+.cfm-btn--danger:hover:not(:disabled) {
+  background: #d13a3f;
+}
+
+.cfm-btn--primary {
+  background: var(--orange);
+  color: #fff;
+}
+
+.cfm-btn--primary:hover:not(:disabled) {
+  background: var(--orange-dark);
+}
+
+.cfm-btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.cfm-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  animation: cfm-spin 0.7s linear infinite;
+}
+
+@keyframes cfm-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cfm-pop {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes cfm-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 480px) {
+  .cfm-dialog { padding: 24px 18px 18px; border-radius: 16px; }
+  .cfm-title { font-size: 18px; }
+  .cfm-actions { flex-direction: column-reverse; }
+}

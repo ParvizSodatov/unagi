@@ -6,11 +6,13 @@
   --orange: #e8622e;
   --orange-dark: #cf5524;
   --orange-soft: #f08a5d;
-  --ink: #232323;
-  --ink-soft: #444444;
+  /* Шкала текста: от главного к самому тихому. Всё серое в системе берём отсюда. */
+  --ink: #232323;        /* заголовки и основной текст */
+  --ink-soft: #444444;   /* вторичный текст, подписи полей */
+  --muted: #605d57;      /* описания, пояснения под заголовками */
+  --faint: #75716a;      /* прочерки, плейсхолдеры, иконки в полях */
   --paper: #ffffff;
   --paper-warm: #f7f5f2;
-  --muted: #797874;
   --line: #ececea;
   --green: #6a8a2e;
   --radius: 12px;
@@ -80,7 +82,7 @@ img { max-width: 100%; display: block; }
 
 /* Шапка поверх тёмного hero — светлый текст */
 .header--over-hero .logo__word { color: #fff; }
-.header--over-hero .nav__link { color: rgba(255,255,255,.85); }
+.header--over-hero .nav__link { color: rgba(255,255,255,.92); }
 .header--over-hero .nav__link:hover { color: #fff; }
 .header--over-hero .nav__link.is-active { color: var(--orange); }
 .header--over-hero .cart-btn { color: #fff; }
@@ -107,13 +109,13 @@ img { max-width: 100%; display: block; }
 }
 .hero__content { position: relative; padding-top: 90px; max-width: 600px; color: #fff; }
 .hero__title { font-size: clamp(44px, 6.5vw, 80px); font-weight: 800; letter-spacing: -1.5px; color: #fff; }
-.hero__subtitle { color: rgba(255,255,255,.82); font-size: clamp(16px, 2.2vw, 19px); margin: 22px 0 34px; max-width: 480px; }
+.hero__subtitle { color: rgba(255,255,255,.9); font-size: clamp(16px, 2.2vw, 19px); margin: 22px 0 34px; max-width: 480px; }
 .hero__actions { display: flex; gap: 14px; flex-wrap: wrap; }
 .hero .btn--ghost { color: #fff; border-color: rgba(255,255,255,.4); }
 .hero .btn--ghost:hover { border-color: var(--orange); color: var(--orange); background: rgba(255,255,255,.05); }
 .hero__meta { display: flex; gap: 40px; margin-top: 48px; flex-wrap: wrap; }
 .hero__meta-item b { display: block; font-family: 'Jost', sans-serif; font-size: 30px; font-weight: 800; color: #fff; }
-.hero__meta-item span { color: rgba(255,255,255,.65); font-size: 14px; }
+.hero__meta-item span { color: rgba(255,255,255,.8); font-size: 14px; }
 
 /* ===== Шапка внутренних страниц ===== */
 .page-hero { padding: 116px 0 40px; background: var(--paper-warm); border-bottom: 1px solid var(--line); }
@@ -144,17 +146,31 @@ img { max-width: 100%; display: block; }
 .menu__page-btn:hover:not(:disabled) { color: var(--ink); border-color: var(--orange); }
 .menu__page-btn.is-active { background: var(--orange); color: #fff; border-color: var(--orange); }
 .menu__page-btn:disabled { opacity: 0.4; cursor: default; }
-.dish { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: transform .25s, box-shadow .25s; }
+/* Карточка — четыре строки: фото, название с ценой, состав, кнопка.
+   Отступы висят на самих строках, а не на обёртке, чтобы строки могли лечь на сетку ряда. */
+.dish { display: grid; grid-template-rows: auto auto 1fr auto; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: transform .25s, box-shadow .25s; }
 .dish:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
 .dish__media { height: 160px; overflow: hidden; background: #fff; padding: 10px 10px 0; }
 .dish__media img { width: 100%; height: 100%; object-fit: contain; }
 .dish__placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 56px; opacity: 0.45; }
-.dish__body { display: flex; flex-direction: column; flex: 1; padding: 20px 22px 22px; }
-.dish__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-.dish__name { font-size: 22px; font-weight: 700; }
+.dish__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 20px 22px 0; }
+.dish__name { font-size: 22px; font-weight: 700; line-height: 1.25; }
 .dish__price { color: var(--orange); font-weight: 800; font-size: 19px; white-space: nowrap; font-family: 'Jost', sans-serif; }
-.dish__desc { color: var(--muted); font-size: 14px; margin: 6px 0 18px; }
-.dish__btn { width: 100%; margin-top: auto; padding-top: 10px; padding-bottom: 10px; }
+/* Состав с граммовкой — единственный текст на карточке под названием */
+.dish__composition { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 8px 0 18px; padding: 0 22px; }
+.dish__btn { margin: 0 22px 22px; padding-top: 10px; padding-bottom: 10px; }
+
+/* Выравнивание карточек в ряду: строки берутся из внешней сетки (subgrid), поэтому
+   название стоит на одной линии с соседними названиями, а состав — с составом,
+   даже когда имя переносится на две-три строки. Свой row-gap: 0 — чтобы зазор сетки
+   не растащил строки внутри карточки, между рядами он остаётся. */
+@supports (grid-template-rows: subgrid) {
+  .dish { grid-row: span 4; grid-template-rows: subgrid; row-gap: 0; }
+}
+/* Запасной вариант для браузеров без subgrid: резервируем под название две строки. */
+@supports not (grid-template-rows: subgrid) {
+  .dish__name { min-height: 2.5em; }
+}
 
 /* ===== О нас ===== */
 .about__inner { display: grid; grid-template-columns: 1.05fr .95fr; gap: 60px; align-items: center; }
@@ -195,14 +211,22 @@ a.contacts__value:hover { color: var(--orange); }
 .contacts__map { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); }
 .contacts__map iframe { width: 100%; height: 420px; border: 0; display: block; }
 
+/* ===== Админка: единая типографика заголовков =====
+   Внутри antd-раскладки заголовки набраны инлайном, поэтому размеры задаём здесь,
+   чтобы «Заказы», «Блюда», «Склад» и остальные разделы выглядели одинаково. */
+.ant-layout h1 { font-size: 26px; line-height: 1.2; }
+.ant-layout h2 { font-size: 22px; line-height: 1.25; letter-spacing: -.2px; }
+.ant-layout h3 { font-size: 17px; line-height: 1.3; font-weight: 600; }
+.ant-layout h4 { font-size: 15px; line-height: 1.35; font-weight: 600; }
+
 /* ===== Подвал ===== */
 .footer { background: #1f1f1f; color: #fff; padding: 64px 0 0; }
 .footer__inner { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 32px; padding-bottom: 48px; }
-.footer__desc { color: rgba(255,255,255,.55); margin-top: 16px; font-size: 15px; }
+.footer__desc { color: rgba(255,255,255,.74); margin-top: 16px; font-size: 15px; }
 .footer__col h4 { font-size: 19px; margin-bottom: 16px; font-family: 'Jost', sans-serif; }
-.footer__col p, .footer__col a { color: rgba(255,255,255,.55); display: block; font-size: 15px; margin-bottom: 9px; transition: color .2s; }
+.footer__col p, .footer__col a { color: rgba(255,255,255,.74); display: block; font-size: 15px; margin-bottom: 9px; transition: color .2s; }
 .footer__col a:hover { color: var(--orange); }
-.footer__bottom { border-top: 1px solid rgba(255,255,255,.1); padding: 22px 0; color: rgba(255,255,255,.45); font-size: 14px; text-align: center; }
+.footer__bottom { border-top: 1px solid rgba(255,255,255,.1); padding: 22px 0; color: rgba(255,255,255,.62); font-size: 14px; text-align: center; }
 
 /* ===== Вход в админку (сплит-экран) ===== */
 .admin-login {
@@ -231,7 +255,7 @@ a.contacts__value:hover { color: var(--orange); }
 .admin-login__photo > * { position: relative; z-index: 1; }
 .admin-login__slogan { max-width: 360px; }
 .admin-login__slogan h2 { font-family: 'Jost', sans-serif; font-size: 34px; line-height: 1.2; margin-bottom: 12px; }
-.admin-login__slogan p { color: rgba(255,255,255,.85); font-size: 16px; }
+.admin-login__slogan p { color: rgba(255,255,255,.9); font-size: 16px; }
 .admin-login__form {
   display: flex;
   align-items: center;
@@ -338,4 +362,6 @@ a.contacts__value:hover { color: var(--orange); }
   .header--over-hero .nav.is-open .nav__link:hover { color: var(--orange); }
   .header--over-hero .nav.is-open .nav__link.is-active { color: var(--orange); }
   .features__grid, .features__grid--4, .menu__grid, .channels, .footer__inner { grid-template-columns: 1fr; }
+  /* Одна карточка в ряду — выравнивать не с чем, резерв под вторую строку не нужен */
+  .dish__name { min-height: 0; }
 }

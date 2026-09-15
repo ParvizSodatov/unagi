@@ -3,6 +3,7 @@ import { ConfigProvider, App as AntApp, Layout, Menu, Button, Spin } from 'antd'
 import {
   DashboardOutlined, ShoppingOutlined, AppstoreOutlined, TagsOutlined,
   TeamOutlined, ClockCircleOutlined, LogoutOutlined, CarOutlined, EnvironmentOutlined,
+  InboxOutlined,
 } from '@ant-design/icons'
 import { auth } from '../api'
 import AdminLogin from './admin/AdminLogin'
@@ -14,6 +15,7 @@ import StaffSection from './admin/sections/StaffSection'
 import TimesheetSection from './admin/sections/TimesheetSection'
 import DeliverySection from './admin/sections/DeliverySection'
 import CouriersSection from './admin/sections/CouriersSection'
+import StockSection from './admin/sections/StockSection'
 
 const { Sider, Content, Header } = Layout
 
@@ -22,6 +24,7 @@ const MENU_ITEMS = [
   { key: 'orders', icon: <ShoppingOutlined />, label: 'Заказы' },
   { key: 'dishes', icon: <AppstoreOutlined />, label: 'Блюда' },
   { key: 'categories', icon: <TagsOutlined />, label: 'Категории' },
+  { key: 'stock', icon: <InboxOutlined />, label: 'Склад' },
   { key: 'delivery', icon: <CarOutlined />, label: 'Доставка' },
   { key: 'couriers', icon: <EnvironmentOutlined />, label: 'Курьеры' },
   { key: 'staff', icon: <TeamOutlined />, label: 'Сотрудники' },
@@ -33,6 +36,7 @@ const SECTIONS = {
   orders: OrdersSection,
   dishes: DishesSection,
   categories: CategoriesSection,
+  stock: StockSection,
   delivery: DeliverySection,
   couriers: CouriersSection,
   staff: StaffSection,
@@ -101,7 +105,7 @@ function AdminRoot() {
               width: 38,
               height: 38,
               borderRadius: 11,
-              background: '#F15A24',
+              background: 'var(--orange)',
               display: 'grid',
               placeItems: 'center',
               flexShrink: 0,
@@ -139,15 +143,15 @@ function AdminRoot() {
             alignItems: 'center',
             justifyContent: 'flex-end',
             padding: '0 24px',
-            borderBottom: '1px solid #f0f0f0',
+            borderBottom: '1px solid var(--line)',
           }}
         >
-          <span style={{ marginRight: 16, color: '#555' }}>👤 {user.login}</span>
+          <span style={{ marginRight: 16, color: 'var(--ink-soft)' }}>👤 {user.login}</span>
           <Button icon={<LogoutOutlined />} onClick={handleLogout}>
             Выйти
           </Button>
         </Header>
-        <Content style={{ padding: 24, background: '#f5f5f5' }}>
+        <Content style={{ padding: 24, background: 'var(--paper-warm)' }}>
           <div style={{ background: '#fff', padding: 24, borderRadius: 8 }}>
             <Section />
           </div>
@@ -157,9 +161,35 @@ function AdminRoot() {
   )
 }
 
+// Тема админки. Те же шрифты и та же шкала текста, что и на сайте,
+// чтобы админка и витрина выглядели одной системой (см. :root в index.css).
+const ADMIN_THEME = {
+  token: {
+    colorPrimary: '#e8622e',
+    colorLink: '#e8622e',
+    fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontSize: 14,
+    colorText: '#232323',
+    colorTextHeading: '#232323',
+    colorTextSecondary: '#444444',
+    colorTextLabel: '#444444',
+    colorTextDescription: '#605d57',
+    colorTextTertiary: '#605d57',
+    colorTextPlaceholder: '#75716a',
+    colorTextQuaternary: '#75716a',
+    colorBorder: '#e2e0dd',
+    colorBorderSecondary: '#ececea',
+    borderRadius: 8,
+  },
+  components: {
+    Table: { headerColor: '#232323', headerBg: '#f7f5f2', rowHoverBg: '#faf9f7' },
+    Menu: { itemColor: '#444444', itemSelectedColor: '#e8622e' },
+  },
+}
+
 export default function AdminPage() {
   return (
-    <ConfigProvider theme={{ token: { colorPrimary: '#F15A24' } }}>
+    <ConfigProvider theme={ADMIN_THEME}>
       <AntApp>
         <AdminRoot />
       </AntApp>

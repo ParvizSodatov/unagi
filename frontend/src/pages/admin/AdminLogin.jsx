@@ -41,7 +41,7 @@ export default function AdminLogin({ onSuccess }) {
       <div className="admin-login__form">
         <div style={{ width: 360, maxWidth: '100%' }}>
           <h1 style={{ fontSize: 26, marginBottom: 6 }}>Вход в админку</h1>
-          <p style={{ color: '#888', marginBottom: 28 }}>
+          <p style={{ color: 'var(--muted)', marginBottom: 28 }}>
             Введите данные, чтобы продолжить
           </p>
           <Form layout="vertical" onFinish={handleSubmit} requiredMark={false} size="large">

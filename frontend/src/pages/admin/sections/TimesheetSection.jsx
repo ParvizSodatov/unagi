@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   Table, Button, Modal, Form, InputNumber, Input, DatePicker,
-  Popconfirm, Tag, App, List, Empty, Segmented, Calendar, Select,
+  Tag, App, List, Empty, Segmented, Calendar, Select,
 } from 'antd'
 import {
   PlusOutlined, DeleteOutlined, ClockCircleOutlined,
@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { staff } from '../../../api'
+import { useConfirm } from '../../../components/ConfirmDialog.jsx'
 
 const ROLES = {
   cook: { label: 'Повар', color: 'volcano' },
@@ -22,6 +23,7 @@ const roleInfo = (v) => ROLES[v] || { label: v, color: 'default' }
 
 export default function TimesheetSection() {
   const { message } = App.useApp()
+  const { confirmDelete } = useConfirm()
   const [view, setView] = useState('list') // 'list' | 'calendar'
   const [month, setMonth] = useState(dayjs())
   const [list, setList] = useState([]) // активные сотрудники
@@ -275,20 +277,24 @@ export default function TimesheetSection() {
           renderItem={(s) => (
             <List.Item
               actions={[
-                <Popconfirm
+                <Button
                   key="del"
-                  title="Удалить смену?"
-                  okText="Да"
-                  cancelText="Нет"
-                  onConfirm={() => handleDelete(s.id)}
-                >
-                  <Button size="small" type="text" danger icon={<DeleteOutlined />} />
-                </Popconfirm>,
+                  size="small"
+                  type="text"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => confirmDelete({
+                    title: 'Удалить смену?',
+                    description: 'Часы перестанут учитываться в табеле и зарплате.',
+                    name: `${dayjs(s.date).format('DD.MM.YYYY')} · ${s.hours} ч`,
+                    onConfirm: () => handleDelete(s.id),
+                  })}
+                />,
               ]}
             >
               <List.Item.Meta
                 title={`${dayjs(s.date).format('DD.MM.YYYY')} · ${s.hours} ч`}
-                description={s.note ? <span style={{ color: '#888' }}>{s.note}</span> : null}
+                description={s.note ? <span style={{ color: 'var(--muted)' }}>{s.note}</span> : null}
               />
             </List.Item>
           )}
@@ -331,21 +337,25 @@ export default function TimesheetSection() {
           renderItem={(s) => (
             <List.Item
               actions={[
-                <Popconfirm
+                <Button
                   key="del"
-                  title="Удалить смену?"
-                  okText="Да"
-                  cancelText="Нет"
-                  onConfirm={() => handleDayDelete(s)}
-                >
-                  <Button size="small" type="text" danger icon={<DeleteOutlined />} />
-                </Popconfirm>,
+                  size="small"
+                  type="text"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => confirmDelete({
+                    title: 'Удалить смену?',
+                    description: 'Часы перестанут учитываться в табеле и зарплате.',
+                    name: `${s.staff_name} · ${s.hours} ч`,
+                    onConfirm: () => handleDayDelete(s),
+                  })}
+                />,
               ]}
             >
               <List.Item.Meta
                 avatar={<Tag color={roleInfo(s.staff_role).color}>{roleInfo(s.staff_role).label}</Tag>}
                 title={`${s.staff_name} · ${s.hours} ч`}
-                description={s.note ? <span style={{ color: '#888' }}>{s.note}</span> : null}
+                description={s.note ? <span style={{ color: 'var(--muted)' }}>{s.note}</span> : null}
               />
             </List.Item>
           )}

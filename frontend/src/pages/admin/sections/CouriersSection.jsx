@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Table, Button, Space, Modal, Form, Input, Switch, Tag, Popconfirm, App, Empty } from 'antd'
+import { Table, Button, Space, Modal, Form, Input, Switch, Tag, App, Empty } from 'antd'
 import { PlusOutlined, DeleteOutlined, LinkOutlined, ReloadOutlined } from '@ant-design/icons'
 import { couriers as couriersApi } from '../../../api'
+import { useConfirm } from '../../../components/ConfirmDialog.jsx'
 import CourierMap from './CourierMap'
 
 // Ссылка курьера для его телефона.
@@ -21,6 +22,7 @@ function agoLabel(lastAt) {
 
 export default function CouriersSection() {
   const { message } = App.useApp()
+  const { confirmDelete } = useConfirm()
   const [rows, setRows] = useState([])
   const [locations, setLocations] = useState([])
   const [loading, setLoading] = useState(false)
@@ -137,9 +139,17 @@ export default function CouriersSection() {
       title: '',
       width: 50,
       render: (_, row) => (
-        <Popconfirm title="Удалить курьера?" okText="Да" cancelText="Нет" onConfirm={() => handleDelete(row.id)}>
-          <Button size="small" danger icon={<DeleteOutlined />} />
-        </Popconfirm>
+        <Button
+          size="small"
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => confirmDelete({
+            title: 'Удалить курьера?',
+            description: 'Его ссылка перестанет работать.',
+            name: row.name,
+            onConfirm: () => handleDelete(row.id),
+          })}
+        />
       ),
     },
   ]
@@ -159,7 +169,7 @@ export default function CouriersSection() {
       </div>
 
       {locations.length === 0 && (
-        <p style={{ color: '#888', marginTop: -6, marginBottom: 12 }}>
+        <p style={{ color: 'var(--muted)', marginTop: -6, marginBottom: 12 }}>
           На карте появятся курьеры, которые вышли на смену со своего телефона.
         </p>
       )}

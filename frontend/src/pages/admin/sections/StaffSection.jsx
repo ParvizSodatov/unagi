@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import {
   Table, Button, Space, Modal, Form, Input, InputNumber, Select,
-  Popconfirm, Tag, App, DatePicker, List, Empty, Tabs, Radio, Statistic, Row, Col,
+  Tag, App, DatePicker, List, Empty, Tabs, Radio, Statistic, Row, Col,
 } from 'antd'
 import {
   PlusOutlined, EditOutlined, DeleteOutlined, WalletOutlined,
 } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { staff } from '../../../api'
+import { useConfirm } from '../../../components/ConfirmDialog.jsx'
 
 // Должности: значение в БД → подпись + цвет тега
 const ROLES = [
@@ -23,6 +24,7 @@ const money = (n) => `${Number(n || 0).toLocaleString('ru-RU')} c.`
 
 export default function StaffSection() {
   const { message } = App.useApp()
+  const { confirmDelete } = useConfirm()
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
@@ -230,15 +232,17 @@ export default function StaffSection() {
             title="Зарплата"
           />
           <Button size="small" icon={<EditOutlined />} onClick={() => openEdit(row)} />
-          <Popconfirm
-            title="Удалить сотрудника?"
-            description="История выплат тоже удалится."
-            okText="Да"
-            cancelText="Нет"
-            onConfirm={() => handleDelete(row.id)}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
+          <Button
+            size="small"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => confirmDelete({
+              title: 'Удалить сотрудника?',
+              description: 'История выплат, штрафов и премий тоже удалится.',
+              name: row.name,
+              onConfirm: () => handleDelete(row.id),
+            })}
+          />
         </Space>
       ),
     },
@@ -372,21 +376,25 @@ export default function StaffSection() {
                     renderItem={(p) => (
                       <List.Item
                         actions={[
-                          <Popconfirm
+                          <Button
                             key="del"
-                            title="Удалить выплату?"
-                            okText="Да"
-                            cancelText="Нет"
-                            onConfirm={() => handleDeletePayment(p.id)}
-                          >
-                            <Button size="small" type="text" danger icon={<DeleteOutlined />} />
-                          </Popconfirm>,
+                            size="small"
+                            type="text"
+                            danger
+                            icon={<DeleteOutlined />}
+                            onClick={() => confirmDelete({
+                              title: 'Удалить выплату?',
+                              description: 'Сумма перестанет учитываться в расчёте зарплаты.',
+                              name: money(p.amount),
+                              onConfirm: () => handleDeletePayment(p.id),
+                            })}
+                          />,
                         ]}
                       >
                         <List.Item.Meta
                           title={money(p.amount)}
                           description={
-                            <span style={{ color: '#888' }}>
+                            <span style={{ color: 'var(--muted)' }}>
                               {p.period ? `за ${p.period}` : ''}
                               {p.comment ? ` · ${p.comment}` : ''}
                               {` · ${dayjs(p.paid_at).format('DD.MM.YYYY')}`}
@@ -442,15 +450,19 @@ export default function StaffSection() {
                       return (
                         <List.Item
                           actions={[
-                            <Popconfirm
+                            <Button
                               key="del"
-                              title="Удалить запись?"
-                              okText="Да"
-                              cancelText="Нет"
-                              onConfirm={() => handleDeleteAdjustment(a.id)}
-                            >
-                              <Button size="small" type="text" danger icon={<DeleteOutlined />} />
-                            </Popconfirm>,
+                              size="small"
+                              type="text"
+                              danger
+                              icon={<DeleteOutlined />}
+                              onClick={() => confirmDelete({
+                                title: fine ? 'Удалить штраф?' : 'Удалить премию?',
+                                description: 'Запись перестанет учитываться в расчёте зарплаты.',
+                                name: money(a.amount),
+                                onConfirm: () => handleDeleteAdjustment(a.id),
+                              })}
+                            />,
                           ]}
                         >
                           <List.Item.Meta
@@ -462,7 +474,7 @@ export default function StaffSection() {
                               </span>
                             }
                             description={
-                              <span style={{ color: '#888' }}>
+                              <span style={{ color: 'var(--muted)' }}>
                                 {a.reason || 'без причины'}
                                 {a.period ? ` · за ${a.period}` : ''}
                                 {` · ${dayjs(a.created_at).format('DD.MM.YYYY')}`}

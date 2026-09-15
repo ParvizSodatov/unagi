@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import bcrypt from 'bcryptjs'
 import db, { transaction } from './db.js'
+import { compositions } from './compositions.js'
 
 // Категории и блюда — актуальное меню суши-бара (из Instagram @unagi_tj, август 2026).
 const categories = [
@@ -147,9 +148,37 @@ function seedDishes() {
     console.log(`Блюда уже есть (${count}), пропускаю.`)
     return
   }
-  const insert = db.prepare('INSERT INTO dishes (name, cat, price, img, desc) VALUES (?, ?, ?, ?, ?)')
-  transaction(() => dishes.forEach((d) => insert.run(d.name, d.cat, d.price, d.img, d.desc)))
+  const insert = db.prepare(
+    'INSERT INTO dishes (name, cat, price, img, desc, composition) VALUES (?, ?, ?, ?, ?, ?)',
+  )
+  transaction(() =>
+    dishes.forEach((d) => insert.run(d.name, d.cat, d.price, d.img, d.desc, compositions[d.name] ?? null)),
+  )
   console.log(`Добавлено блюд: ${dishes.length}`)
+}
+
+// Дозаливка состава в уже существующую базу.
+// seedDishes выше пропускает работу, если блюда есть, поэтому состав добавляем отдельно.
+// Трогаем только пустые ячейки — то, что уже поправили руками в админке, не перезаписываем.
+function backfillCompositions() {
+  const rows = db.prepare(
+    "SELECT id, name FROM dishes WHERE composition IS NULL OR composition = ''",
+  ).all()
+  if (rows.length === 0) {
+    console.log('Состав у всех блюд заполнен, пропускаю.')
+    return
+  }
+  const update = db.prepare('UPDATE dishes SET composition = ? WHERE id = ?')
+  let filled = 0
+  transaction(() => {
+    for (const row of rows) {
+      const text = compositions[row.name]
+      if (!text) continue
+      update.run(text, row.id)
+      filled += 1
+    }
+  })
+  console.log(`Состав добавлен блюдам: ${filled} (без состава осталось ${rows.length - filled})`)
 }
 
 // Стартовые зоны доставки по Душанбе (примерные — потом меняются в админке).
@@ -189,6 +218,7 @@ function seedAdmin() {
 
 seedCategories()
 seedDishes()
+backfillCompositions()
 seedZones()
 seedAdmin()
 console.log('Сид завершён.')

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Table, Button, Space, Modal, Form, Input, InputNumber, Switch, Tag, Popconfirm, App } from 'antd'
+import { Table, Button, Space, Modal, Form, Input, InputNumber, Switch, Tag, App } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { delivery } from '../../../api'
+import { useConfirm } from '../../../components/ConfirmDialog.jsx'
 
 export default function DeliverySection() {
   const { message } = App.useApp()
+  const { confirmDelete } = useConfirm()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
@@ -97,9 +99,17 @@ export default function DeliverySection() {
       render: (_, row) => (
         <Space>
           <Button size="small" icon={<EditOutlined />} onClick={() => openEdit(row)} />
-          <Popconfirm title="Удалить зону?" okText="Да" cancelText="Нет" onConfirm={() => handleDelete(row.id)}>
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
+          <Button
+            size="small"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => confirmDelete({
+              title: 'Удалить зону доставки?',
+              description: 'Зона пропадёт из расчёта стоимости доставки.',
+              name: row.name,
+              onConfirm: () => handleDelete(row.id),
+            })}
+          />
         </Space>
       ),
     },

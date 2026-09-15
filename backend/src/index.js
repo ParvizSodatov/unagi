@@ -12,6 +12,7 @@ import staffRoutes from './routes/staff.js'
 import statsRoutes from './routes/stats.js'
 import deliveryRoutes from './routes/delivery.js'
 import courierRoutes from './routes/couriers.js'
+import stockRoutes from './routes/stock.js'
 import { telegramEnabled, startTelegramBot } from './notify.js'
 
 const app = express()
@@ -37,6 +38,7 @@ app.use('/api/staff', staffRoutes)
 app.use('/api/stats', statsRoutes)
 app.use('/api/delivery', deliveryRoutes)
 app.use('/api/couriers', courierRoutes)
+app.use('/api/stock', stockRoutes)
 
 // 404 для неизвестных API-роутов
 app.use('/api', (req, res) => res.status(404).json({ error: 'Не найдено' }))

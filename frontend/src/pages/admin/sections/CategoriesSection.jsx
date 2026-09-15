@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Table, Button, Space, Modal, Form, Input, InputNumber, Popconfirm, App } from 'antd'
+import { Table, Button, Space, Modal, Form, Input, InputNumber, App } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import { menu } from '../../../api'
+import { useConfirm } from '../../../components/ConfirmDialog.jsx'
 
 // Транслитерация названия в латинский слаг: «Жареные роллы» → «zharenye-rolly»
 const TRANSLIT = {
@@ -24,6 +25,7 @@ function slugify(label) {
 
 export default function CategoriesSection() {
   const { message } = App.useApp()
+  const { confirmDelete } = useConfirm()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
@@ -101,14 +103,17 @@ export default function CategoriesSection() {
       render: (_, row) => (
         <Space>
           <Button size="small" icon={<EditOutlined />} onClick={() => openEdit(row)} />
-          <Popconfirm
-            title="Удалить категорию?"
-            okText="Да"
-            cancelText="Нет"
-            onConfirm={() => handleDelete(row.id)}
-          >
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
+          <Button
+            size="small"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => confirmDelete({
+              title: 'Удалить категорию?',
+              description: 'Категория будет удалена без возможности восстановления.',
+              name: row.label,
+              onConfirm: () => handleDelete(row.id),
+            })}
+          />
         </Space>
       ),
     },
@@ -122,7 +127,7 @@ export default function CategoriesSection() {
           <Input
             allowClear
             placeholder="Поиск по названию"
-            prefix={<SearchOutlined style={{ color: '#bbb' }} />}
+            prefix={<SearchOutlined style={{ color: 'var(--faint)' }} />}
             style={{ width: 220 }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}

@@ -81,19 +81,17 @@ export default function Menu({ preview = false }) {
                   ? <img src={d.img} alt={d.name} loading="lazy" />
                   : <span className="dish__placeholder" aria-hidden="true">🍣</span>}
               </div>
-              <div className="dish__body">
-                <div className="dish__head">
-                  <h3 className="dish__name">{d.name}</h3>
-                  <span className="dish__price">{d.price} c.</span>
-                </div>
-                <p className="dish__desc">{d.desc}</p>
-                <button
-                  className="btn btn--primary dish__btn"
-                  onClick={() => handleAdd(d)}
-                >
-                  {added === d.id ? 'Добавлено ✓' : 'В корзину'}
-                </button>
+              <div className="dish__head">
+                <h3 className="dish__name">{d.name}</h3>
+                <span className="dish__price">{d.price} c.</span>
               </div>
+              <p className="dish__composition">{d.composition}</p>
+              <button
+                className="btn btn--primary dish__btn"
+                onClick={() => handleAdd(d)}
+              >
+                {added === d.id ? 'Добавлено ✓' : 'В корзину'}
+              </button>
             </article>
           ))}
         </div>

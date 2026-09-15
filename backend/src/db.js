@@ -128,6 +128,70 @@ db.exec(`
   );
 `)
 
+// ─── Складской учёт ─────────────────────────────────────────────────
+// Идея: текущий остаток нигде не хранится, он всегда вычисляется:
+//   остаток = факт последней проведённой ревизии
+//           + приход − списания − расход по продажам (заказы × техкарта)
+// Так остаток не «уплывает» от ошибок и не требует лезть в оформление заказа.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS products (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT NOT NULL UNIQUE,
+    unit       TEXT NOT NULL DEFAULT 'г',   -- базовая единица: г, мл, шт
+    price      REAL NOT NULL DEFAULT 0,     -- себестоимость за одну базовую единицу
+    min_stock  REAL NOT NULL DEFAULT 0,     -- порог, ниже которого подсвечиваем
+    active     INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  -- Техкарта: сколько продукта уходит на одну порцию блюда
+  CREATE TABLE IF NOT EXISTS dish_products (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    dish_id    INTEGER NOT NULL REFERENCES dishes(id) ON DELETE CASCADE,
+    product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    qty        REAL NOT NULL,
+    UNIQUE (dish_id, product_id)
+  );
+
+  -- Движения склада. Продажи сюда НЕ пишутся: их расход считается из заказов.
+  CREATE TABLE IF NOT EXISTS stock_moves (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    type       TEXT NOT NULL,               -- 'in' приход | 'out' списание
+    qty        REAL NOT NULL,               -- в базовых единицах продукта
+    price      REAL,                        -- цена за единицу в этой поставке
+    comment    TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  -- Акт инвентаризации за период
+  CREATE TABLE IF NOT EXISTS revisions (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    period     TEXT NOT NULL,               -- 'YYYY-MM' или произвольная метка
+    from_at    TEXT NOT NULL,               -- начало периода (конец прошлой ревизии)
+    to_at      TEXT NOT NULL,               -- момент пересчёта
+    applied_at TEXT,                        -- NULL пока черновик; заполнено — проведена
+    comment    TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS revision_items (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    revision_id INTEGER NOT NULL REFERENCES revisions(id) ON DELETE CASCADE,
+    product_id  INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    opening     REAL NOT NULL DEFAULT 0,    -- остаток на начало периода
+    income      REAL NOT NULL DEFAULT 0,    -- приход за период
+    sold        REAL NOT NULL DEFAULT 0,    -- расход по продажам (теоретический)
+    written_off REAL NOT NULL DEFAULT 0,    -- списания
+    expected    REAL NOT NULL DEFAULT 0,    -- сколько должно остаться
+    actual      REAL,                       -- сколько насчитали руками (NULL — ещё не считали)
+    UNIQUE (revision_id, product_id)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_stock_moves_product ON stock_moves(product_id, created_at);
+  CREATE INDEX IF NOT EXISTS idx_dish_products_dish  ON dish_products(dish_id);
+`)
+
 // ─── Мягкие миграции: добавляем недостающие колонки в существующие таблицы ───
 function ensureColumn(table, column, definition) {
   const cols = db.prepare(`PRAGMA table_info(${table})`).all()
@@ -139,5 +203,9 @@ function ensureColumn(table, column, definition) {
 // Доставка в заказе: название зоны и её стоимость (для заказов, созданных до фичи — 0).
 ensureColumn('orders', 'delivery_zone', 'TEXT')
 ensureColumn('orders', 'delivery_fee', 'REAL NOT NULL DEFAULT 0')
+
+// Состав блюда с граммовкой («Лосось 40 г, рис 100 г, нори 3 г»).
+// Хранится отдельно от desc: desc — это порция и краткое описание, composition — ингредиенты.
+ensureColumn('dishes', 'composition', 'TEXT')
 
 export default db

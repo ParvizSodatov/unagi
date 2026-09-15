@@ -61,32 +61,33 @@ router.delete('/categories/:id', requireAuth, (req, res) => {
 // ─── CRUD блюд (только админ) ──────────────────────────────────────
 
 router.post('/dishes', requireAuth, (req, res) => {
-  const { name, cat, price, img = null, desc = null, available = 1 } = req.body || {}
+  const { name, cat, price, img = null, desc = null, composition = null, available = 1 } = req.body || {}
   if (!name || !cat || price == null) return res.status(400).json({ error: 'Нужны name, cat и price' })
   const catExists = db.prepare('SELECT id FROM categories WHERE id = ?').get(cat)
   if (!catExists) return res.status(400).json({ error: 'Такой категории нет' })
   const info = db
-    .prepare('INSERT INTO dishes (name, cat, price, img, desc, available) VALUES (?, ?, ?, ?, ?, ?)')
-    .run(name, cat, price, img, desc, available ? 1 : 0)
+    .prepare('INSERT INTO dishes (name, cat, price, img, desc, composition, available) VALUES (?, ?, ?, ?, ?, ?, ?)')
+    .run(name, cat, price, img, desc, composition, available ? 1 : 0)
   res.status(201).json(db.prepare('SELECT * FROM dishes WHERE id = ?').get(info.lastInsertRowid))
 })
 
 router.put('/dishes/:id', requireAuth, (req, res) => {
   const dish = db.prepare('SELECT * FROM dishes WHERE id = ?').get(req.params.id)
   if (!dish) return res.status(404).json({ error: 'Блюдо не найдено' })
-  const { name, cat, price, img, desc, available } = req.body || {}
+  const { name, cat, price, img, desc, composition, available } = req.body || {}
   if (cat != null) {
     const catExists = db.prepare('SELECT id FROM categories WHERE id = ?').get(cat)
     if (!catExists) return res.status(400).json({ error: 'Такой категории нет' })
   }
   db.prepare(
-    'UPDATE dishes SET name = ?, cat = ?, price = ?, img = ?, desc = ?, available = ? WHERE id = ?',
+    'UPDATE dishes SET name = ?, cat = ?, price = ?, img = ?, desc = ?, composition = ?, available = ? WHERE id = ?',
   ).run(
     name ?? dish.name,
     cat ?? dish.cat,
     price ?? dish.price,
     img !== undefined ? img : dish.img,
     desc !== undefined ? desc : dish.desc,
+    composition !== undefined ? composition : dish.composition,
     available != null ? (available ? 1 : 0) : dish.available,
     req.params.id,
   )
